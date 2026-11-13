@@ -29,4 +29,7 @@ else()
 endif()
 target_compile_options(wsdrSupport PRIVATE -Wall -Wextra -Wno-cpp) # -Wno-cpp: SoapySDR headers include <ciso646> (deprecated in C++20)
 # Keep devourer/wsdrcore symbols private to the module (other Soapy modules share the process).
-target_link_options(wsdrSupport PRIVATE -Wl,--exclude-libs,ALL)
+# GNU ld only; macOS ld64 rejects it and its two-level namespace already keeps module symbols apart.
+if(NOT APPLE)
+  target_link_options(wsdrSupport PRIVATE -Wl,--exclude-libs,ALL)
+endif()
