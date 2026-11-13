@@ -30,6 +30,9 @@
 namespace wsdr {
 
 constexpr uint16_t kPid8812bu = 0xb812;
+constexpr uint16_t kPidT3uPlus = 0x0138; // TP-Link Archer T3U Plus (vid 0x2357): an RTL8812BU, the 8822B path
+// The Jaguar2 adapters (8822B).
+inline bool jaguar2_pid(uint16_t pid) { return pid == kPid8812bu || pid == kPidT3uPlus; }
 constexpr uint16_t kPid8812cu = 0xc812;
 constexpr uint16_t kPid8812eu = 0xa81a; // RTL8812EU (RTL8822E): runs the 8822C code unchanged (notes/cu-custom-code.md)
 // The Jaguar3 adapters (8822C, 8822E): the 8822C LA dialect, loader, streamer and gain map throughout.

@@ -652,7 +652,7 @@ int find_device(libusb_context *ctx, const OpenOpts &o, libusb_device **out) {
   int rc = LIBUSB_ERROR_NOT_FOUND;
   for (ssize_t i = 0; i < n; i++) {
     libusb_device_descriptor d{};
-    if (libusb_get_device_descriptor(list[i], &d) != 0 || d.idVendor != o.vid || d.idProduct != o.pid)
+    if (libusb_get_device_descriptor(list[i], &d) != 0 || d.idVendor != o.usb_vid() || d.idProduct != o.pid)
       continue;
     if (o.bus >= 0 && libusb_get_bus_number(list[i]) != o.bus)
       continue;
@@ -681,7 +681,7 @@ int cmd_reset(const Args &a) {
   libusb_device *dev = nullptr;
   int rc = find_device(ctx, a.open, &dev);
   if (rc != 0) {
-    std::fprintf(stderr, "reset: adapter %04x:%04x bus %d port %s not found\n", a.open.vid,
+    std::fprintf(stderr, "reset: adapter %04x:%04x bus %d port %s not found\n", a.open.usb_vid(),
                  a.open.pid, a.open.bus, a.open.port.c_str());
     libusb_exit(ctx);
     return 3;

@@ -65,8 +65,8 @@ using clk = std::chrono::steady_clock;
 
 namespace {
 
-constexpr uint16_t kVid = 0x0bda;
 constexpr uint16_t kPid8812bu = 0xb812;
+constexpr uint16_t kPidT3uPlus = 0x0138; // TP-Link Archer T3U Plus (vid 0x2357, usb_vid_for): an RTL8812BU
 constexpr uint16_t kPid8812cu = 0xc812;
 constexpr uint16_t kPid8812eu = 0xa81a; // RTL8822E: the 8822C path throughout
 // Measured dB per IGI step: 8822B 0.95, 8822C ~1.0 (FINDINGS §4). Range IGI 0x1C..0x50.
@@ -553,8 +553,8 @@ SoapySDR::KwargsList find_wsdr(const SoapySDR::Kwargs &args) {
   const ssize_t n = libusb_get_device_list(ctx, &list);
   for (ssize_t i = 0; i < n; i++) {
     libusb_device_descriptor d{};
-    if (libusb_get_device_descriptor(list[i], &d) != 0 || d.idVendor != kVid ||
-        (d.idProduct != kPid8812bu && d.idProduct != kPid8812cu && d.idProduct != kPid8812eu))
+    if (libusb_get_device_descriptor(list[i], &d) != 0 || d.idVendor != usb_vid_for(d.idProduct) ||
+        (d.idProduct != kPid8812bu && d.idProduct != kPidT3uPlus && d.idProduct != kPid8812cu && d.idProduct != kPid8812eu))
       continue;
     char pid[8];
     std::snprintf(pid, sizeof pid, "0x%04x", d.idProduct);
@@ -586,7 +586,7 @@ SoapySDR::KwargsList find_wsdr(const SoapySDR::Kwargs &args) {
     libusb_free_device_list(list, 1);
   libusb_exit(ctx);
   // 8812BU first (the default adapter), then 8812CU, then 8812EU: by rank, not by the pid string
-  const auto rank = [](const SoapySDR::Kwargs &k) { return k.at("pid") == "0xb812" ? 0 : k.at("pid") == "0xc812" ? 1 : 2; };
+  const auto rank = [](const SoapySDR::Kwargs &k) { return k.at("pid") == "0xb812" || k.at("pid") == "0x0138" ? 0 : k.at("pid") == "0xc812" ? 1 : 2; };
   std::stable_sort(out.begin(), out.end(), [&](const auto &a, const auto &b) { return rank(a) < rank(b); });
   return out;
 }

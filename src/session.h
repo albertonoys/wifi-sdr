@@ -16,9 +16,13 @@
 
 namespace wsdr {
 
+// USB vendor id that goes with a pid: Realtek's, except the TP-Link Archer T3U Plus (2357:0138, an RTL8812BU).
+constexpr uint16_t usb_vid_for(uint16_t pid) { return pid == 0x0138 ? 0x2357 : 0x0bda; }
+
 struct OpenOpts {
-  uint16_t vid = 0x0bda;
+  uint16_t vid = 0;   // 0 = usb_vid_for(pid)
   uint16_t pid = 0;   // required
+  uint16_t usb_vid() const { return vid ? vid : usb_vid_for(pid); }
   int bus = -1;       // optional: only the adapter on this USB bus ...
   std::string port;   // ... and port path ("1", "1.2"); empty = any
   int channel = 36;
