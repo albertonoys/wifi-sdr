@@ -57,6 +57,9 @@ struct RxSettings {
   bool agc = false;     // true: chip AGC; false: fixed gain (OFDM CCA off, IGI pinned)
   double gain_db = 30;
   bool allow_gapped = false; // rate_sel below min_rate_sel streams gapped (see BankMeta::gapped)
+  bool usb_reset = false; // fd path only: libusb_reset_device before claim, to recover a wedged stream on
+                          // a reopen (a replug otherwise). Off by default: a reset can re-enumerate and
+                          // invalidate a freshly granted fd, so first open leaves it off.
 };
 
 struct RxCaps {

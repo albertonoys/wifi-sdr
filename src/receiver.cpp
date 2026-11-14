@@ -85,7 +85,8 @@ void Receiver::open(uint16_t pid, const RxSettings &initial, int bus, const std:
   o.port = port;
   o.sys_fd = sys_fd;
   if (sys_fd >= 0)
-    o.reset = false; // a USB reset can re-enumerate the device and invalidate the granted fd
+    o.reset = initial.usb_reset; // a USB reset can re-enumerate and invalidate the granted fd, so it is
+                                 // off by default here; a reopen asks for it to recover a wedged stream
   o.bw = cu && !initial.allow_gapped ? 20 : width_of(initial, cu); // 8812CU at 40 MS/s only gapped
   o.channel = channel_for(initial.freq, o.bw);
   o.thermal_track = false; // no host register traffic while streaming
